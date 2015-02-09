@@ -52,13 +52,22 @@ class XXOBJ:
             for row in csv.reader(f1):
                 if len(row) == 5:
                     self.cursor.callproc("xx_obj_py_pkg.REC_CUST_OBJ",
-                                         [self.xxid, row[1], row[2], row[3], row[4], None])
+                                         [self.xxid, row[0], row[1], row[2], row[3], row[4], None])
+                elif len(row) == 3:
+                    self.cursor.callproc("xx_obj_py_pkg.REC_CUST_OBJ",
+                                         [self.xxid, row[0], row[1], row[2], None, None, None])
+                elif len(row) == 4:
+                    self.cursor.callproc("xx_obj_py_pkg.REC_CUST_OBJ",
+                                         [self.xxid, row[0], row[1], row[2], row[3], None, None])
                 else:
                     self.cursor.callproc("xx_obj_py_pkg.REC_CUST_OBJ",
-                                         [self.xxid, row[1], row[2], row[3], row[4], row[5]])
+                                         [self.xxid, row[0], row[1], row[2], row[3], row[4], row[5]])
 
     def initobjlistinfo(self):
         self.cursor.callproc("xx_obj_py_pkg.GEN_OBJ_DDL_LIST", [self.xxid])
+
+    def purgeoldtemp(self):
+        self.cursor.callproc("xx_obj_py_pkg.PURGE_TEMP_TABLES")
 
     def genobjddl(self, outPath):
         query = "SELECT PROGRAM_CODE||'/'||OWNER PATH,OBJECT_TYPE,OBJECT_NAME,SCRIPT_FILE_NAME FROM XX_DDL_SCRIPT_LIST_TMP WHERE xx_cust_id = :xx_id"

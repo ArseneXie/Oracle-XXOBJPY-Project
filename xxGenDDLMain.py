@@ -63,6 +63,11 @@ class genDDLGui(Frame):
         self.btnGenScript.grid(row=4, column=1)
         self.btnGenScript["command"] = self.btnGenScriptMethod
 
+        self.btnPurgeTemp = Button(self)
+        self.btnPurgeTemp["text"] = "Purge Temp"
+        self.btnPurgeTemp.grid(row=4, column=2)
+        self.btnPurgeTemp["command"] = self.btnPurgeTempMethod
+
     def strDefMethod(self):
         self.connStr.delete(0, END)
         self.connStr.insert(0, "apps/v05appS126@asus_ebs_8005")
@@ -100,6 +105,11 @@ class genDDLGui(Frame):
             theobj.readobjlist(self.objList.get())
             theobj.initobjlistinfo()
             theobj.genobjddl(self.outPath.get())
+
+    def btnPurgeTempMethod(self):
+        with XXOBJ(self.connStr.get()) as theobj:
+            theobj.purgeoldtemp()
+
 
 if __name__ == '__main__':
     root = Tk()
