@@ -3,7 +3,9 @@ CREATE OR REPLACE PACKAGE XX_OBJ_PY_PKG IS
   /**
   *Gen DDL and Setup Script via Python
   *@author <a href="mailto:arsene@readycom.com.tw">Arsene</a>
-  *@version 0.1a,2014/12/30 under develop
+  *@version 1.1, 2015/11/09 
+  *@hist 1.0, 2014/12/30, Arsene, Create and Develop
+  *@hist 1.1, 2015/11/09, Arsene, Tune to fit VBA Project, and fix some bugs
   */
 
   C_NOLOG   CONSTANT NUMBER := 0;
@@ -1150,10 +1152,10 @@ CREATE OR REPLACE PACKAGE BODY XX_OBJ_PY_PKG IS
         IF V_TEMP_FLAG = 'Y' THEN
           V_RETURN := V_RETURN || CHR(10) ||
                       'CREATE GLOBAL TEMPORARY TABLE ' || V_PREFIX ||
-                      P_OBJ_NAME || '(';
+                      P_OBJ_NAME || CHR(10) || '(';
         ELSE
           V_RETURN := V_RETURN || CHR(10) || 'CREATE TABLE ' || V_PREFIX ||
-                      P_OBJ_NAME || '(';
+                      P_OBJ_NAME || CHR(10) || '(';
         END IF;
         FOR REC IN CUR_TBL_COLS LOOP
           V_COUNTER := V_COUNTER + 1;
@@ -1259,13 +1261,13 @@ CREATE OR REPLACE PACKAGE BODY XX_OBJ_PY_PKG IS
         --Comment
         FOR RTM IN CUR_TAB_CMM LOOP
           V_COMMENT_STMT := 'COMMENT ON TABLE ' || V_PREFIX || RTM.TAB_NAME ||
-                            ' IS ''' || RTM.COMMENTS || ''';';
+                            CHR(10) || ' IS ''' || RTM.COMMENTS || ''';';
           V_RETURN       := V_RETURN || CHR(10) || V_COMMENT_STMT;
         END LOOP;
         FOR RCM IN CUR_COL_CMM LOOP
           V_COMMENT_STMT := 'COMMENT ON COLUMN ' || V_PREFIX ||
-                            RCM.COL_NAME || ' IS ''' || RCM.COMMENTS ||
-                            ''';';
+                            RCM.COL_NAME || CHR(10) || ' IS ''' ||
+                            RCM.COMMENTS || ''';';
           V_RETURN       := V_RETURN || CHR(10) || V_COMMENT_STMT;
         END LOOP;
         V_RETURN := V_RETURN || CHR(10) || Z_BLANK_LINE;
@@ -1476,7 +1478,11 @@ CREATE OR REPLACE PACKAGE BODY XX_OBJ_PY_PKG IS
         FROM XX_SCHEMA_INFO_TMP
        WHERE SCHEMA_NAME = P_OBJ_SCHEMA
          AND XX_CUST_ID = Z_CUST_ID;
-      V_IDX_STMT := V_IDX_STMT || 'TABLESPACE ' || V_IDX_TS || ';';
+      IF V_IDX_TS IS NULL THEN
+        V_IDX_STMT := V_IDX_STMT || '; ';
+      ELSE
+        V_IDX_STMT := V_IDX_STMT || 'TABLESPACE ' || V_IDX_TS || ';';
+      END IF;
     END IF;
   
     RETURN V_IDX_STMT;
